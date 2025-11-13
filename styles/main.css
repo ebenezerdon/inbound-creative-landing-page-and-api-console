@@ -1,0 +1,54 @@
+/* Global styles for inbound - keep Tailwind directives in inline blocks only */
+:root {
+  --ink: #0b1b2b;
+  --paper: #faf7f2;
+}
+
+html:focus-within { scroll-behavior: smooth; }
+
+/***********************
+ Editorial layout helpers
+***********************/
+.gridless-flow { /* stacked flow without strict grid */ }
+.gridless-list li { margin: 0.25rem 0; }
+.gridless-stack > * + * { margin-top: 1rem; }
+
+/***********************
+ Marquee
+***********************/
+.marquee { position: relative; overflow: hidden; height: 52px; display: flex; align-items: center; }
+.marquee-track { display: inline-flex; gap: 2rem; white-space: nowrap; will-change: transform; animation: marqueeroll 18s linear infinite; padding: 0 1rem; }
+.marquee-track.paused, .group:hover .marquee-track { animation-play-state: paused; }
+.marquee span { font-weight: 800; color: #0f172a; opacity: 0.85; }
+@keyframes marqueeroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/***********************
+ Reveal on scroll
+***********************/
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 600ms ease, transform 600ms ease; }
+.reveal.reveal-in { opacity: 1; transform: translateY(0); }
+
+/***********************
+ Case scroller
+***********************/
+.case-scroller { position: relative; }
+.case-track { display: grid; grid-auto-flow: column; grid-auto-columns: 80%; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 0.25rem; }
+@media (min-width: 768px) { .case-track { grid-auto-columns: 42%; } }
+.case-card { scroll-snap-align: start; border: 1px solid rgba(15,23,42,0.15); background: #fff; border-radius: 1rem; padding: 1rem; }
+.case-controls { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
+.case-track::-webkit-scrollbar { height: 10px; }
+.case-track::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.2); border-radius: 999px; }
+
+/***********************
+ Accessibility and motion
+***********************/
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within { scroll-behavior: auto; }
+  .reveal { transition: none; }
+  .marquee-track { animation: none; }
+}
+
+/***********************
+ Footer misc
+***********************/
+#year::after { content: ""; }

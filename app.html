@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>inbound API Console</title>
+  <meta name="description" content="Try the inbound email API in a safe, local console. Build requests and copy curl commands.">
+  <link rel="stylesheet" href="styles/main.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-slate-900">
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200/60">
+    <div class="max-w-6xl mx-auto px-5 md:px-8 flex items-center justify-between py-3">
+      <a href="index.html" class="flex items-center gap-3" aria-label="Back to landing">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white font-black">in</span>
+        <span class="font-black tracking-tight text-xl">inbound</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-2">
+        <a class="nav-link" href="index.html#api">API</a>
+        <a class="nav-link" href="index.html#devexp">Developers</a>
+      </nav>
+      <div class="hidden md:flex items-center gap-3">
+        <a class="btn-ghost" href="index.html">Back to site</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-12">
+    <div class="flex items-end justify-between flex-wrap gap-4 mb-6">
+      <div>
+        <p class="eyebrow">Playground</p>
+        <h1 class="font-black text-3xl md:text-4xl tracking-tight">API Console</h1>
+        <p class="text-slate-700 mt-2">Craft a request and copy as JSON or curl. Nothing is sent to a server in this demo.</p>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn-ghost" id="loadDemo">Load demo</button>
+        <button class="btn-primary" id="saveState">Save</button>
+      </div>
+    </div>
+
+    <div id="apiConsole" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <section class="card lg:col-span-5">
+        <h2 class="font-bold text-xl">Request Settings</h2>
+        <div class="mt-4 space-y-4">
+          <label class="block">
+            <span class="text-sm text-slate-700">API Key</span>
+            <input id="apiKey" type="password" class="input" placeholder="YOUR_API_KEY" autocomplete="off">
+          </label>
+          <label class="block">
+            <span class="text-sm text-slate-700">Endpoint</span>
+            <input id="endpoint" type="text" class="input" value="https://inbound.new/v2/emails">
+          </label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block">
+              <span class="text-sm text-slate-700">From</span>
+              <input id="from" type="email" class="input" value="agent@inbnd.dev">
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-700">To</span>
+              <input id="to" type="email" class="input" value="you@example.com">
+            </label>
+          </div>
+          <label class="block">
+            <span class="text-sm text-slate-700">Subject</span>
+            <input id="subject" type="text" class="input" value="Welcome to Inbound">
+          </label>
+          <label class="block">
+            <span class="text-sm text-slate-700">HTML Body</span>
+            <textarea id="html" rows="5" class="input" placeholder="<p>Thanks for signing up!</p>"><p>Thanks for signing up!</p></textarea>
+          </label>
+          <div class="flex flex-wrap gap-3 mt-2">
+            <button class="btn-primary" id="buildJson">Build JSON</button>
+            <button class="btn-ghost" id="copyJson" data-copy data-copy-target="#jsonOut">Copy JSON</button>
+            <button class="btn-ghost" id="copyCurl" data-copy data-copy-target="#curlOut">Copy curl</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card lg:col-span-7">
+        <h2 class="font-bold text-xl">Preview</h2>
+        <div class="mt-4 space-y-4">
+          <div>
+            <div class="text-xs text-slate-600 mb-1">JSON</div>
+            <div class="codeframe mono"><pre><code id="jsonOut">{}</code></pre></div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-600 mb-1">curl</div>
+            <div class="codeframe mono"><pre><code id="curlOut">curl -X POST https://inbound.new/v2/emails \ 
+  -H "Authorization: Bearer YOUR_API_KEY" \ 
+  -H "Content-Type: application/json" \ 
+  -d '{"from":"agent@inbnd.dev","to":"you@example.com","subject":"Welcome to Inbound","html":"<p>Thanks for signing up!</p>"}'</code></pre></div>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <button class="btn-dark" id="mockSend">Send (mock)</button>
+            <button class="btn-ghost" id="clearLog">Clear log</button>
+          </div>
+          <div class="mt-4">
+            <h3 class="font-semibold">Activity</h3>
+            <ul id="activity" class="mt-2 space-y-2 text-sm text-slate-700"></ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-200">
+    <div class="max-w-6xl mx-auto px-5 md:px-8 py-8 text-sm text-slate-600">This console saves your inputs to your browser only.</div>
+  </footer>
+
+  <style type="text/tailwindcss" data-teda="tailwind-apply">
+    @layer components {
+      .input { @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300; }
+      .nav-link { @apply text-slate-700 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium; }
+      .btn-primary { @apply inline-flex items-center justify-center whitespace-nowrap rounded-full bg-sky-700 text-white text-sm md:text-base font-semibold px-5 py-3 shadow-sm hover:bg-sky-800 active:bg-sky-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-300 transition; }
+      .btn-ghost { @apply inline-flex items-center justify-center whitespace-nowrap rounded-full border border-slate-300/70 bg-white text-slate-800 text-sm md:text-base font-medium px-5 py-3 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition; }
+      .btn-dark { @apply inline-flex items-center justify-center whitespace-nowrap rounded-full bg-slate-900 text-white text-sm md:text-base font-semibold px-5 py-3 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition; }
+      .codeframe { @apply rounded-xl bg-slate-950 text-slate-100 p-4 md:p-5 shadow-inner ring-1 ring-slate-800 overflow-x-auto; }
+      .mono { @apply font-mono text-[13px] md:text-sm text-slate-100; }
+      .eyebrow { @apply uppercase tracking-[0.18em] text-[11px] md:text-xs text-slate-600 font-semibold; }
+    }
+  </style>
+
+  <!-- Required script order -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="scripts/helpers.js"></script>
+  <script src="scripts/ui.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+</html>

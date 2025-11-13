@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>inbound: Complete Email API</title>
+  <meta name="description" content="inbound is a complete email API for sending, receiving, threading and AI-powered replies. Want email? Get inbound.">
+  <link rel="stylesheet" href="styles/main.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style type="text/tailwindcss" data-teda="tailwind-apply">
+    @layer components {
+      .btn-primary { @apply inline-flex items-center justify-center whitespace-nowrap rounded-full bg-sky-700 text-white text-sm md:text-base font-semibold px-5 py-3 shadow-sm hover:bg-sky-800 active:bg-sky-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-300 transition; }
+      .btn-ghost { @apply inline-flex items-center justify-center whitespace-nowrap rounded-full border border-slate-300/70 bg-white text-slate-800 text-sm md:text-base font-medium px-5 py-3 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition; }
+      .btn-dark { @apply inline-flex items-center justify-center whitespace-nowrap rounded-full bg-slate-900 text-white text-sm md:text-base font-semibold px-5 py-3 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition; }
+      .chip { @apply inline-flex items-center rounded-full bg-slate-900 text-white text-xs md:text-sm px-3 py-1.5 tracking-wide; }
+      .chip-alt { @apply inline-flex items-center rounded-full bg-amber-400 text-slate-900 text-xs md:text-sm px-3 py-1.5 font-semibold; }
+      .eyebrow { @apply uppercase tracking-[0.18em] text-[11px] md:text-xs text-slate-600 font-semibold; }
+      .card { @apply relative rounded-2xl bg-white/90 backdrop-blur border border-slate-200 shadow-[0_10px_30px_rgba(2,6,23,0.07)] p-6 md:p-8; }
+      .pull-quote { @apply italic text-slate-800 text-lg md:text-xl leading-relaxed; }
+      .mono { @apply font-mono text-[13px] md:text-sm text-slate-800; }
+      .codeframe { @apply rounded-xl bg-slate-950 text-slate-100 p-4 md:p-5 shadow-inner ring-1 ring-slate-800 overflow-x-auto; }
+      .kicker { @apply text-slate-700 text-base md:text-lg leading-relaxed; }
+      .section { @apply relative mx-auto px-5 md:px-8 max-w-7xl; }
+      .badge-dot { @apply relative pl-4; }
+      .badge-dot::before { content: ""; @apply absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-rose-500; }
+      .tag { @apply inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white text-slate-700 text-xs px-2.5 py-1; }
+      .link { @apply underline decoration-sky-400/60 underline-offset-4 hover:decoration-sky-500 transition; }
+      .nav-link { @apply text-slate-700 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium; }
+      .sr-only { @apply absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0; }
+    }
+  </style>
+</head>
+<body class="bg-white text-slate-900 selection:bg-sky-200 selection:text-slate-900">
+  <!-- Top Navigation -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200/60">
+    <div class="section flex items-center justify-between py-3">
+      <a href="#top" class="flex items-center gap-3" aria-label="inbound home">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white font-black">in</span>
+        <span class="font-black tracking-tight text-xl">inbound</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-2">
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#api">API</a>
+        <a class="nav-link" href="#use-cases">Use cases</a>
+        <a class="nav-link" href="#devexp">Developers</a>
+      </nav>
+      <div class="hidden md:flex items-center gap-3">
+        <a class="btn-ghost" href="#api">View API</a>
+        <a class="btn-primary" href="app.html">Start building</a>
+      </div>
+      <button class="md:hidden inline-flex items-center justify-center p-2 rounded-md hover:bg-slate-100" id="mobileMenuBtn" aria-label="Open menu">
+        <span class="sr-only">Open menu</span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="md:hidden hidden border-t border-slate-200">
+      <div class="section py-3 flex flex-col gap-2">
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#api">API</a>
+        <a class="nav-link" href="#use-cases">Use cases</a>
+        <a class="nav-link" href="#devexp">Developers</a>
+        <a class="btn-primary mt-2" href="app.html">Start building</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero: Editorial layout -->
+  <section id="top" class="section relative pt-10 md:pt-16 pb-16 md:pb-24">
+    <!-- Background headline for texture -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 -top-8 md:-top-16 text-slate-200/70 font-black tracking-tight text-[22vw] leading-none text-center select-none">inbound</div>
+
+    <!-- Content stack with asymmetry, no 50/50 -->
+    <div class="relative">
+      <p class="eyebrow mb-4">Email infrastructure, designed like a product</p>
+      <h1 class="leading-[0.95] tracking-tight font-black text-[11vw] md:text-[7vw] -ml-1 md:-ml-2">
+        Ship email<br>
+        without the weight
+      </h1>
+      <div class="mt-6 md:mt-8 max-w-2xl kicker">
+        <p>Simple email processing API for receiving and managing emails programmatically. Send, receive, thread, and reply with full context.</p>
+      </div>
+
+      <!-- Irregular side pull-quote -->
+      <aside class="pull-quote max-w-xs md:max-w-sm absolute right-1 md:right-6 -top-4 md:top-6 rotate-1">“want email? get inbound.”</aside>
+
+      <!-- CTA row -->
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a href="app.html" class="btn-primary">Start building</a>
+        <a href="#api" class="btn-ghost" data-scroll-to="#api">See the API</a>
+        <span class="tag">No SDK lock-in</span>
+        <span class="tag">Works with your ESP</span>
+      </div>
+
+      <!-- Feature chips diagonally placed -->
+      <div class="mt-10 relative">
+        <ul class="flex flex-wrap gap-2 md:gap-3">
+          <li class="chip">inbound email</li>
+          <li class="chip-alt">outbound email</li>
+          <li class="chip">threaded email</li>
+          <li class="chip-alt">replying to email</li>
+          <li class="chip">email for agents</li>
+          <li class="chip-alt">email for humans</li>
+          <li class="chip">email for marketing</li>
+          <li class="chip-alt">email for transactions</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Marquee divider -->
+    <div class="mt-12 md:mt-16">
+      <div class="marquee group border-y border-slate-200 bg-white/70 hover:bg-white">
+        <div class="marquee-track group-hover:paused">
+          <span>inbound email</span>
+          <span>outbound email</span>
+          <span>threaded email</span>
+          <span>replying to email</span>
+          <span>email for agents</span>
+          <span>email for humans</span>
+          <span>email for marketing</span>
+          <span>email for transactions</span>
+        </div>
+        <div class="marquee-track" aria-hidden="true">
+          <span>inbound email</span>
+          <span>outbound email</span>
+          <span>threaded email</span>
+          <span>replying to email</span>
+          <span>email for agents</span>
+          <span>email for humans</span>
+          <span>email for marketing</span>
+          <span>email for transactions</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complete Email API Solution -->
+  <section id="features" class="section py-16 md:py-24">
+    <div class="gridless-flow">
+      <div class="max-w-3xl">
+        <p class="eyebrow mb-3">Complete Email API Solution</p>
+        <h2 class="font-black text-4xl md:text-5xl tracking-tight leading-[1.05]">Everything you need to handle email in your application</h2>
+        <p class="mt-4 kicker">From transactional sending to AI-powered replies. One consistent surface for email across your product.</p>
+      </div>
+
+      <div class="mt-10 md:mt-12 space-y-6">
+        <!-- Card 1 -->
+        <article class="card reveal border-l-4 border-sky-500">
+          <h3 class="font-extrabold text-2xl">Transactional Email Sending</h3>
+          <p class="mt-2 text-slate-700">Deliver confirmations, notifications, and alerts with a reliable sending API. Fully compatible with popular email services. Also called outbound email sending, wilson.</p>
+          <ul class="mt-4 text-slate-800 gridless-list">
+            <li class="badge-dot">High deliverability rates</li>
+            <li class="badge-dot">Template support</li>
+            <li class="badge-dot">Bulk email sending</li>
+            <li class="badge-dot">Email tracking and analytics</li>
+          </ul>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="card reveal border-l-4 border-amber-400">
+          <h3 class="font-extrabold text-2xl">Threaded Email Reception</h3>
+          <p class="mt-2 text-slate-700">Receive inbound email via webhooks and automatically organize conversations into manageable threads. Access structured data including HTML, text, attachments, and headers.</p>
+          <ul class="mt-4 text-slate-800 gridless-list">
+            <li class="badge-dot">Webhook email parsing</li>
+            <li class="badge-dot">Custom domain setup</li>
+            <li class="badge-dot">Attachment handling</li>
+            <li class="badge-dot">Email forwarding rules</li>
+          </ul>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="card reveal border-l-4 border-rose-500">
+          <h3 class="font-extrabold text-2xl">AI Agent Integration for Email</h3>
+          <p class="mt-2 text-slate-700">Integrate AI agents to classify, summarize, and reply using full thread context for precise, automated responses.</p>
+          <ul class="mt-4 text-slate-800 gridless-list">
+            <li class="badge-dot">Conversation threading</li>
+            <li class="badge-dot">AI-powered replies</li>
+            <li class="badge-dot">Email classification</li>
+            <li class="badge-dot">Custom response logic</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Developer Experience -->
+  <section id="devexp" class="section py-16 md:py-24">
+    <div class="gridless-flow">
+      <div class="max-w-3xl">
+        <p class="eyebrow mb-3">Developer Experience</p>
+        <h2 class="font-black text-4xl md:text-5xl tracking-tight">Built for developers</h2>
+        <p class="mt-4 kicker">A simple, consistent REST API with typed webhooks. Clear errors. Predictable resources.</p>
+        <div class="mt-6 flex flex-wrap gap-2">
+          <span class="tag">Consistent REST resources</span>
+          <span class="tag">Idempotent and clear errors</span>
+          <span class="tag">Typed webhooks</span>
+        </div>
+      </div>
+
+      <div class="mt-10 gridless-stack">
+        <article class="card reveal">
+          <h3 class="font-extrabold text-xl md:text-2xl">Unified Email API</h3>
+          <p class="mt-2 text-slate-700">Send, receive, and reply via REST. Webhooks deliver structured events for replies and delivery.</p>
+          <ul class="mt-4 text-slate-800 gridless-list">
+            <li class="badge-dot">Emails, threads, attachments — predictable endpoints</li>
+            <li class="badge-dot">Safe retries with explicit status codes</li>
+            <li class="badge-dot">Structured payloads for replies and delivery</li>
+          </ul>
+
+          <div class="mt-6 codeframe mono" id="codeSample">
+<pre><code id="codeBlock">POST /v2/emails
+POST https://inbound.new/v2/emails
+Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "from": "agent@inbnd.dev",
+  "to": "you@example.com",
+  "subject": "Welcome to Inbound",
+  "html": "<p>Thanks for signing up!</p>"
+}</code></pre>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <button class="btn-dark" data-copy data-copy-target="#codeBlock">Copy example</button>
+            <a class="btn-ghost" href="app.html">Open API console</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- API section -->
+  <section id="api" class="section py-16 md:py-24">
+    <div class="gridless-flow">
+      <div class="max-w-3xl">
+        <p class="eyebrow mb-3">API Overview</p>
+        <h2 class="font-black text-4xl md:text-5xl tracking-tight">POST /v2/emails</h2>
+        <p class="mt-4 kicker">Consistent REST resources</p>
+        <ul class="mt-4 text-slate-800 gridless-list">
+          <li class="badge-dot">Emails, threads, attachments — predictable endpoints</li>
+          <li class="badge-dot">Idempotent & clear errors</li>
+          <li class="badge-dot">Typed webhooks</li>
+        </ul>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a class="btn-primary" href="app.html">Start with a mock request</a>
+          <a class="btn-ghost" href="#use-cases" data-scroll-to="#use-cases">Explore use cases</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases -->
+  <section id="use-cases" class="section py-16 md:py-24">
+    <div class="flex flex-col gap-6 md:gap-8">
+      <div class="max-w-3xl">
+        <p class="eyebrow mb-3">Use Cases</p>
+        <h2 class="font-black text-4xl md:text-5xl tracking-tight">Email API use cases</h2>
+        <p class="mt-3 kicker">Power onboarding, lifecycle messaging, support, and growth across your product.</p>
+      </div>
+
+      <div class="case-scroller reveal" id="caseScroller" aria-label="Use cases">
+        <div class="case-track">
+          <article class="case-card">
+            <header class="flex items-center justify-between">
+              <h3 class="font-bold">SaaS Applications</h3>
+              <span class="tag">Product</span>
+            </header>
+            <p class="mt-2 text-slate-700">Onboarding, notifications, and support across your app lifecycle.</p>
+          </article>
+          <article class="case-card">
+            <header class="flex items-center justify-between">
+              <h3 class="font-bold">E-commerce</h3>
+              <span class="tag">Commerce</span>
+            </header>
+            <p class="mt-2 text-slate-700">Orders, shipping updates, and customer support automation.</p>
+          </article>
+          <article class="case-card">
+            <header class="flex items-center justify-between">
+              <h3 class="font-bold">Customer Support</h3>
+              <span class="tag">Service</span>
+            </header>
+            <p class="mt-2 text-slate-700">AI agents to resolve common issues and route complex tickets.</p>
+          </article>
+          <article class="case-card">
+            <header class="flex items-center justify-between">
+              <h3 class="font-bold">Marketing Automation</h3>
+              <span class="tag">Growth</span>
+            </header>
+            <p class="mt-2 text-slate-700">Drip campaigns, newsletters, and behavior-based triggers.</p>
+          </article>
+        </div>
+        <div class="case-controls">
+          <button class="btn-ghost" id="casePrev" aria-label="Scroll left">Prev</button>
+          <button class="btn-primary" id="caseNext" aria-label="Scroll right">Next</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <section class="section py-14">
+    <div class="card flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <h3 class="font-extrabold text-2xl">Want email? Get inbound.</h3>
+        <p class="text-slate-700 mt-1">Send, receive, thread and reply. One API.</p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a class="btn-primary" href="app.html">Open API console</a>
+        <a class="btn-ghost" href="#top" data-scroll-to="#top">Back to top</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-200">
+    <div class="section py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <p class="text-sm text-slate-600">© <span id="year"></span> inbound. All rights reserved.</p>
+      <div class="flex flex-wrap gap-3 text-sm text-slate-600">
+        <span>Privacy</span>
+        <span>Terms</span>
+        <span>Docs</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="scripts/helpers.js"></script>
+  <script src="scripts/ui.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+</html>
